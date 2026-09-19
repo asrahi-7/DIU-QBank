@@ -1,0 +1,13 @@
+﻿{
+    "fetched_at_utc":  "2026-05-23T15:30:31Z",
+    "base_url":  "https://diuqbank.com/questions",
+    "expected_total_from_site":  1299,
+    "pages_crawled":  109,
+    "per_page":  12,
+    "records_fetched":  1299,
+    "distinct_records_by_id":  1299,
+    "duplicate_records_removed":  0,
+    "missing_vs_expected":  0,
+    "complete_match":  true,
+    "duration_seconds":  33.47
+}

@@ -1,0 +1,79 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return signedIn() && request.auth.token.admin == true;
+    }
+
+    function isMainAdmin() {
+      return signedIn() && request.auth.token.mainAdmin == true;
+    }
+
+    function isGoogleUser() {
+      return signedIn()
+        && request.auth.token.firebase != null
+        && request.auth.token.firebase.sign_in_provider == 'google.com';
+    }
+
+    function userDoc(uid) {
+      return get(/databases/$(database)/documents/users/$(uid));
+    }
+
+    function isActiveStudent() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && userDoc(request.auth.uid).data.status == 'active';
+    }
+
+    match /appConfig/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /users/{uid} {
+      allow read: if isAdmin() || (signedIn() && request.auth.uid == uid);
+
+      allow create: if signedIn()
+        && request.auth.uid == uid
+        && request.resource.data.role == 'student'
+        && request.resource.data.email is string
+        && (
+          request.resource.data.status == 'pending'
+          || (request.resource.data.status == 'active' && isGoogleUser())
+        );
+
+      allow update: if isAdmin()
+        || (
+          signedIn()
+          && request.auth.uid == uid
+          && resource.data.role == request.resource.data.role
+          && resource.data.status == request.resource.data.status
+          && request.resource.data.diff(resource.data).changedKeys()
+            .hasOnly(['email', 'displayName', 'photoURL', 'provider', 'lastLoginAt', 'updated_at'])
+        );
+
+      allow delete: if isAdmin();
+    }
+
+    match /submissions/{submissionId} {
+      allow read: if isAdmin()
+        || (signedIn() && resource.data.ownerUid == request.auth.uid);
+
+      allow create: if signedIn()
+        && (isAdmin() || isActiveStudent())
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.status == 'pending'
+        && request.resource.data.course is string
+        && request.resource.data.dept is string
+        && request.resource.data.sem is string
+        && request.resource.data.type in ['Mid', 'Final', 'Quiz', 'Lab Final'];
+
+      allow update, delete: if isAdmin();
+    }
+  }
+}
