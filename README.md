@@ -1,5 +1,7 @@
 # DIU QBank Smart Study Portal
 
+**Live Demo:** [https://asrahi-7.github.io/DIU-QBank/](https://asrahi-7.github.io/DIU-QBank/)
+
 A GitHub Pages-ready frontend for browsing DIU question papers, previewing PDFs, student uploads, admin approval, and AI-assisted study help.
 
 ## What Is Included
@@ -41,20 +43,3 @@ Optional proxy backend:
 
 ```powershell
 npm.cmd run start
-```
-
-Then open:
-
-```txt
-http://127.0.0.1:8787/index.html
-```
-
-## Important Security Note
-
-Do not upload `serviceAccountKey.json` to GitHub. It is a private Firebase admin key. The `.gitignore` file blocks it, but if you manually upload files in the browser, leave it out.
-
-If this key was ever uploaded publicly, revoke it in Google Cloud and create a new service account key.
-
-## Publish To GitHub Pages
-
-Full beginner steps are in [GITHUB_PUBLISH_GUIDE.md](GITHUB_PUBLISH_GUIDE.md).
